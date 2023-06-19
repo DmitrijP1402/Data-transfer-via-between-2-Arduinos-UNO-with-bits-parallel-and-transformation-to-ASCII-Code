@@ -4,10 +4,12 @@ author:    "DmitrijP1402"
 filename:  "Transmitter.ino"
 ********************************************/
 
-void setup() {
-  Serial.begin(9600);
+// max. 60 characters possible --> 480 bits
 
-  pinMode(2, OUTPUT);
+void setup() {
+  Serial.begin(9600); // Start the Serial Monitor
+
+  pinMode(2, OUTPUT); // Set digital pins 2-10 as OUTPUT
   pinMode(3, OUTPUT);
   pinMode(4, OUTPUT);
   pinMode(5, OUTPUT);
@@ -18,23 +20,23 @@ void setup() {
   pinMode(10, OUTPUT);
 }
 
-byte startbit = 0;
+byte startbit = 0; // State of the start bit
 int count = 0;
 
 void loop() {
   if (Serial.available()) {
-    char text = Serial.read();  
-    delay(100);
+    char text = Serial.read(); // Read input text and store it in 'text'
+    delay(10);
     count = count + 1;
     startbit = 1;
 
-    if (startbit == 1 && count == 2) {
+    if (startbit == 1 && count == 2) { // Send start bit
       digitalWrite(10, HIGH);
       startbit = 0;
-      delay(100);
+      delay(10);
     }
 
-    bool bit0 = bitRead(text, 7);
+    bool bit0 = bitRead(text, 7); // Convert ASCII to bits
     bool bit1 = bitRead(text, 6);
     bool bit2 = bitRead(text, 5);
     bool bit3 = bitRead(text, 4);
@@ -43,7 +45,7 @@ void loop() {
     bool bit6 = bitRead(text, 1);
     bool bit7 = bitRead(text, 0);
 
-    digitalWrite(2, bit0);
+    digitalWrite(2, bit0); // Transmit bits through pins 2-9
     digitalWrite(3, bit1);
     digitalWrite(4, bit2);
     digitalWrite(5, bit3);
@@ -52,9 +54,9 @@ void loop() {
     digitalWrite(8, bit6);
     digitalWrite(9, bit7);
 
-    delay(900);
+    delay(90);
 
-    Serial.println("");
+    Serial.println(""); // Output bits and ASCII on the Serial Monitor
     Serial.print(text);
     Serial.print(" --> ");
     Serial.print(bit0);
@@ -65,10 +67,9 @@ void loop() {
     Serial.print(bit5);
     Serial.print(bit6);
     Serial.print(bit7);
-
   } else {
     startbit = 0;
     count = 0;
-    digitalWrite(10, LOW);
+    digitalWrite(10, LOW); // Don't send start bit
   }
 }
